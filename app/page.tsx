@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [password, setPassword] = useState("");
+  const [encryptedData, setEncryptedData] = useState("");
   const PASSWORD_LENGTH = 10;
 
   function generatePassword() {
@@ -31,15 +32,83 @@ export default function Home() {
     setPassword(newPassword);
   }
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  async function getCurrentRound() {
+    const response = await fetch(
+      "https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/latest",
+    );
+    const data = await response.json();
+    return data.round;
+  }
+
+  function calculateFutureRound(
+    currentRound: number,
+    date: string,
+    hour: string,
+    minute: string,
+  ) {
+    const unlockTime = new Date(`${date}T${hour}:${minute}:00`);
+    const now = new Date();
+    const diffSeconds = Math.floor(
+      (unlockTime.getTime() - now.getTime()) / 1000,
+    );
+
+    if (diffSeconds <= 0) return null;
+
+    const roundsToAdd = Math.floor(diffSeconds / 3);
+    return currentRound + roundsToAdd;
+  }
+
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const date = formData.get("date");
-    const hour = formData.get("hour");
-    const minute = formData.get("minute")
-    console.log(date, hour, minute);
-    generatePassword();
+    const date = formData.get("date") as string;
+    const hour = formData.get("hour") as string;
+    const minute = formData.get("minute") as string;
+
+    if (!password) {
+      alert("Please generate a password first!");
+      return;
+    }
+
+    try {
+      const currentRound = await getCurrentRound();
+      const futureRound = calculateFutureRound(
+        currentRound,
+        date,
+        hour,
+        minute,
+      );
+
+      if (!futureRound) {
+        alert("Please select a future date and time!");
+        return;
+      }
+
+      const response = await fetch("/api/encrypt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password,
+          futureRound,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      setEncryptedData(data.encryptedData);
+    } catch (error) {
+      console.error("Encryption failed: ", error);
+      alert("Failed to lock password. Please try again.");
+    }
   }
+
+
 
   return (
     <div className="p-5">
@@ -115,12 +184,43 @@ export default function Home() {
           </div>
         </div>
         <button
-          type="submit"
+          type="button"
+          onClick={generatePassword}
           className="cursor-pointer border rounded-sm mt-4 px-4 py-2 hover:border-sky-300"
         >
-          Generate
+          Generate Password
+        </button>
+        <button
+          type="submit"
+          className="cursor-pointer border rounded-sm mt-4 px-4 py-2 hover:border-sky-300 ml-5"
+        >
+          Lock Password
         </button>
       </form>
+
+      <div className="flex justify-between gap-5">
+        <div className="flex-1">
+          <label htmlFor="access-key">Access key</label>
+          <textarea
+            name="access-key"
+            id="access-key"
+            className="border w-full h-20 block mt-2"
+            value={encryptedData}
+            onChange={(e) => setEncryptedData(e.currentTarget.value)}
+          ></textarea>
+        </div>
+        <div>
+          <label htmlFor="decrypted-text">Decrypted text</label>
+          <input
+            type="text"
+            name="decrypted-text"
+            className="border block px-4 py-2"
+          />
+        </div>
+      </div>
+      <button type="button" className="border cursor-pointer px-5 py-2 mt-5" >
+        Decrpt
+      </button>
     </div>
   );
 }
