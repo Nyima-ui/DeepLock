@@ -1,5 +1,12 @@
 "use client";
 import { useState } from "react";
+import { generateSecurePassword } from "@/lib/password-generator";
+import {
+  calculateFutureRound,
+  parseDateTimeInput,
+  getCurrentRound,
+} from "@/lib/drand-service";
+import { encryptPassword, decryptPassword } from "@/lib/encryption-service";
 
 export default function Home() {
   const [password, setPassword] = useState("");
@@ -8,55 +15,8 @@ export default function Home() {
   const PASSWORD_LENGTH = 10;
 
   function generatePassword() {
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numbers = "0123456789";
-    const symbols = "!@#$%&*()_+-=[]{|;<>?";
-
-    const allChars = lowercase + uppercase + numbers + symbols;
-
-    let newPassword = "";
-
-    newPassword += lowercase[Math.floor(Math.random() * lowercase.length)];
-    newPassword += uppercase[Math.floor(Math.random() * uppercase.length)];
-    newPassword += numbers[Math.floor(Math.random() * numbers.length)];
-    newPassword += symbols[Math.floor(Math.random() * symbols.length)];
-
-    for (let i = 4; i < PASSWORD_LENGTH; i++) {
-      newPassword += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-
-    newPassword = newPassword
-      .split("")
-      .sort(() => Math.random() - 0.5)
-      .join("");
+    const newPassword = generateSecurePassword(PASSWORD_LENGTH);
     setPassword(newPassword);
-  }
-
-  async function getCurrentRound() {
-    const response = await fetch(
-      "https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/latest",
-    );
-    const data = await response.json();
-    return data.round;
-  }
-
-  function calculateFutureRound(
-    currentRound: number,
-    date: string,
-    hour: string,
-    minute: string,
-  ) {
-    const unlockTime = new Date(`${date}T${hour}:${minute}:00`);
-    const now = new Date();
-    const diffSeconds = Math.floor(
-      (unlockTime.getTime() - now.getTime()) / 1000,
-    );
-
-    if (diffSeconds <= 0) return null;
-
-    const roundsToAdd = Math.floor(diffSeconds / 3);
-    return currentRound + roundsToAdd;
   }
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -70,43 +30,22 @@ export default function Home() {
       alert("Please generate a password first!");
       return;
     }
-
     try {
       const currentRound = await getCurrentRound();
-      const futureRound = calculateFutureRound(
-        currentRound,
-        date,
-        hour,
-        minute,
-      );
-
+      const unlockDate = parseDateTimeInput(date, hour, minute);
+      const futureRound = calculateFutureRound(currentRound, unlockDate);
       if (!futureRound) {
-        alert("Please select a future date and time!");
+        alert("Please select a future date and time");
         return;
       }
 
-      const response = await fetch("/api/encrypt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          password,
-          futureRound,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error);
-      }
-
+      const data = await encryptPassword(password, futureRound);
       setEncryptedData(data.encryptedData);
       setUnLockRound(data.unlockRound.toString());
+      alert("Password locked successfully ✅")
     } catch (error) {
-      console.error("Encryption failed: ", error);
-      alert("Failed to lock password. Please try again.");
+      console.error("Encryption failed", error);
+      alert("Encryption failed: try again later");
     }
   }
 
@@ -115,33 +54,10 @@ export default function Home() {
       alert("No encrypted data to decrypt!");
       return;
     }
-
-    try {
-      const response = await fetch("/api/decrypt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ encryptedData }),
-      });
-      const data = await response.json();
-
-      if (!data.success) {
-        if (data.errorType === "TIME_LOCK_ACTIVE") {
-          alert("⏰ Time lock has not expired yet. Please wait.");
-          return;
-        }
-        alert(data.error || "Decryption failed");
-        return;
-      }
-
-      setPassword(data.password);
-      alert(`Decrypted password: ${data.password}`);
-
-    } catch (error) {
-      console.error("Decryption failed: ", error);
-      alert("Failed to decrypt. Please try again.");
-    }
+    const password = await decryptPassword(encryptedData);
+    if (!password) return;
+    setPassword(password);
+    alert(`Decrypted text: ${password}`);
   }
 
   return (
