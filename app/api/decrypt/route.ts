@@ -15,7 +15,9 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       return NextResponse.json(
         {
+          success: false,
           error: "Decryption failed - time lock may not have expired",
+          errorType: "TIME_LOCK_ACTIVE",
         },
         { status: 400 },
       );
@@ -29,6 +31,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Decryption error:", error);
-    return NextResponse.json({ error: "Decryption failed" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Decryption failed", errorType: "UNKNOWN" },
+      { status: 500 },
+    );
   }
 }

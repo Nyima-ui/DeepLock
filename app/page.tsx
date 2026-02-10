@@ -4,6 +4,7 @@ import { useState } from "react";
 export default function Home() {
   const [password, setPassword] = useState("");
   const [encryptedData, setEncryptedData] = useState("");
+  const [unLockRound, setUnLockRound] = useState<string | null>(null);
   const PASSWORD_LENGTH = 10;
 
   function generatePassword() {
@@ -102,13 +103,46 @@ export default function Home() {
       }
 
       setEncryptedData(data.encryptedData);
+      setUnLockRound(data.unlockRound.toString());
     } catch (error) {
       console.error("Encryption failed: ", error);
       alert("Failed to lock password. Please try again.");
     }
   }
 
+  async function handleDecrypt() {
+    if (!encryptedData) {
+      alert("No encrypted data to decrypt!");
+      return;
+    }
 
+    try {
+      const response = await fetch("/api/decrypt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ encryptedData }),
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        if (data.errorType === "TIME_LOCK_ACTIVE") {
+          alert("⏰ Time lock has not expired yet. Please wait.");
+          return;
+        }
+        alert(data.error || "Decryption failed");
+        return;
+      }
+
+      setPassword(data.password);
+      alert(`Decrypted password: ${data.password}`);
+
+    } catch (error) {
+      console.error("Decryption failed: ", error);
+      alert("Failed to decrypt. Please try again.");
+    }
+  }
 
   return (
     <div className="p-5">
@@ -215,10 +249,17 @@ export default function Home() {
             type="text"
             name="decrypted-text"
             className="border block px-4 py-2"
+            value={password}
+            readOnly
           />
         </div>
       </div>
-      <button type="button" className="border cursor-pointer px-5 py-2 mt-5" >
+      {unLockRound && <p>You will get your password at round {unLockRound}</p>}
+      <button
+        type="button"
+        className="border cursor-pointer px-5 py-2 mt-5"
+        onClick={handleDecrypt}
+      >
         Decrpt
       </button>
     </div>
