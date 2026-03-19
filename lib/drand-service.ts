@@ -23,5 +23,7 @@ export function parseDateTimeInput(
   hour: string,
   minute: string,
 ): Date {
+  // e.g: input 2026-03-19T04:04:00
+  // e.g: output will be UTC based 2026-03-18T22:34:00.000Z
   return new Date(`${date}T${hour}:${minute}:00`);
 }

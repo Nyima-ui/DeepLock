@@ -25,7 +25,7 @@ export default function Home() {
     const date = formData.get("date") as string;
     const hour = formData.get("hour") as string;
     const minute = formData.get("minute") as string;
-
+    
     if (!password) {
       alert("Please generate a password first!");
       return;
