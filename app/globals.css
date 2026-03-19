@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+body{
+  font-family: var(--font-manrope), sans-serif;
+}
+
 :root {
   --background: #0a0b10;
-  --foreground: #cdcbcd;
+  --foreground: #D9D7D9;
   --card: #191a33;
 
   --primary-50: #a186ac;
