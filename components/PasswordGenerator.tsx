@@ -72,7 +72,7 @@ const PassswordGenerator = () => {
   }
 
   return (
-    <div className="bg-card rounded-lg p-3.75 max-sm:p-2.5 shadow-card mt-7.5 space-y-7.5">
+    <div className="bg-card rounded-lg p-3.75 max-sm:p-2.5 shadow-card mt-7.5 max-sm:mt-5 space-y-7.5">
       {/* generator  */}
       <div role="group" className="flex gap-6 max-sm:gap-3.75">
         <div className="relative flex-1">
@@ -114,7 +114,10 @@ const PassswordGenerator = () => {
           <button
             type="button"
             aria-label={`Decrease length, current: ${length}`}
-            onClick={() => setLength((l) => Math.max(1, l - 1))}
+            onClick={() => {
+              setLength((l) => Math.max(1, l - 1));
+              handleGenerate({ length: Math.max(1, length - 1) });
+            }}
             className="size-10 rounded-full border border-primary-600 cursor-pointer"
           >
             -
@@ -145,7 +148,10 @@ const PassswordGenerator = () => {
           <button
             type="button"
             aria-label={`Increase length, current: ${length}`}
-            onClick={() => setLength((l) => Math.min(64, l + 1))}
+            onClick={() => {
+              setLength((l) => Math.min(64, l + 1));
+              handleGenerate({ length: Math.min(64, length + 1) });
+            }}
             className="size-10 rounded-full border border-primary-600 cursor-pointer"
           >
             +

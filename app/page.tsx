@@ -1,5 +1,6 @@
-'use client'
+"use client";
 import dynamic from "next/dynamic";
+import Tab from "@/components/Tab";
 
 const PassswordGenerator = dynamic(
   () => import("@/components/PasswordGenerator"),
@@ -12,6 +13,7 @@ const Page = () => {
       <div className="max-w-150">
         <h1 className="text-[39px] max-md:text-[31px]">Generate a password</h1>
         <PassswordGenerator />
+        <Tab />
       </div>
     </main>
   );
