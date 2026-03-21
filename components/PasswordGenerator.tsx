@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CopyButton from "@/components/CopyButton";
 import Loop from "@/components/svgs/Loop";
 import Unchecked from "@/components/svgs/Unchecked";
@@ -68,7 +68,7 @@ const PassswordGenerator = () => {
   }
 
   return (
-    <div className="bg-card rounded-lg p-3.75 max-sm:p-2.5 shadow-card mt-7.5 max-sm:mt-5 space-y-7.5">
+    <div className="bg-card rounded-lg p-3.75 max-sm:p-2.5 shadow-card mt-7.5 max-sm:mt-5 flex flex-col gap-7.5">
       {/* generator  */}
       <div role="group" className="flex gap-6 max-sm:gap-3.75">
         <div className="relative flex-1">
@@ -98,7 +98,7 @@ const PassswordGenerator = () => {
       </div>
 
       {/* length setter  */}
-      <div className="flex items-center justify-between max-sm:flex-col max-sm:items-start max-sm:gap-5">
+      <div className="flex items-center justify-between max-sm:flex-col max-sm:items-start gap-5 max-sm:gap-5">
         <div className="text-[20px]">
           <label htmlFor="password-length">Password length:</label>
           <span className="ml-0.5" aria-live="polite">
