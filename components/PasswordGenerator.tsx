@@ -38,10 +38,6 @@ const PassswordGenerator = () => {
     handleGenerate({ characters });
   }
 
-  useEffect(() => {
-    console.log(options);
-  }, [options]);
-
   const checkboxes = [
     { id: "uppercase", label: "ABC", title: "Uppercase letters" },
     { id: "lowercase", label: "abc", title: "Lowercase letters" },
@@ -118,7 +114,7 @@ const PassswordGenerator = () => {
               setLength((l) => Math.max(1, l - 1));
               handleGenerate({ length: Math.max(1, length - 1) });
             }}
-            className="size-10 rounded-full border border-primary-600 cursor-pointer"
+            className="size-10 rounded-full border border-primary-600 cursor-pointer hover:bg-primary-500 transition-colors duration-150 ease-in"
           >
             -
           </button>
@@ -152,7 +148,7 @@ const PassswordGenerator = () => {
               setLength((l) => Math.min(64, l + 1));
               handleGenerate({ length: Math.min(64, length + 1) });
             }}
-            className="size-10 rounded-full border border-primary-600 cursor-pointer"
+            className="size-10 rounded-full border border-primary-600 cursor-pointer hover:bg-primary-500"
           >
             +
           </button>
