@@ -16,8 +16,8 @@ const Page = () => {
         <PassswordGenerator />
         <Tab />
       </div>
-      <div className="flex-1 max-w-[400px]"> 
-        <h2 className="text-[31px]">Unlock on</h2>
+      <div className="flex-1 max-w-[400px] mt-0 max-xl:mt-9"> 
+        <h2 className="text-[31px] max-lg:text-[28px] max-sm:text-[25px]">Unlock on</h2>
          <UnlockOn />
       </div>
     </main>

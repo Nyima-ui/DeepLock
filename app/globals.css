@@ -6,7 +6,8 @@ body {
 
 :root {
   --background: #0a0b10;
-  --foreground: #d9d7d9;
+  /* --foreground: #d9d7d9; */
+  --foreground: #CDCBCD;
   --card: #191a33;
 
   --primary-50: #a186ac;
@@ -23,6 +24,7 @@ body {
   --primary-950: #0a0b10;
 
   --shadow-card: 1px 2px 2px 1px rgb(55 39 114 / 0.69);
+  --shadow-btn: 0px 2px 2px 0px rgb(55 39 114 / 0.5);
 }
 
 @theme inline {
@@ -44,6 +46,7 @@ body {
   --color-primary-950: var(--primary-950);
 
   --shadow-card: var(--shadow-card);
+  --shadow-btn: var(--shadow-btn);
 }
 
 .slider {
@@ -63,8 +66,4 @@ body {
 
 .slider::-moz-range-thumb {
   @apply w-[27px] h-[27px] bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
-}
-
-.options{
-  @apply 
 }
