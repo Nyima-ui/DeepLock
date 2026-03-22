@@ -1,17 +1,24 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChevronDown from "./svgs/ChevronDown";
 import Calendar from "./Calendar";
 
 const UnlockOn = () => {
   const [isOpen, setisOpen] = useState(false);
   const [selected, setSelected] = useState("1 hour");
-  const [isCalendarOpen, setIsCalendarOpen] = useState(true);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLUListElement>(null);
 
   function handleSelect(option: string) {
     setSelected(option);
     setisOpen(false);
+    if (option === "Custom") {
+      setIsCalendarOpen(true);
+    } else {
+      setIsCalendarOpen(false);
+    }
     triggerRef.current?.focus();
   }
 
@@ -20,6 +27,18 @@ const UnlockOn = () => {
   }
 
   const options = ["1 hour", "6 hours", "1 day", "3 days", "1 week", "Custom"];
+
+  useEffect(() => {
+    if (isCalendarOpen) {
+      calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [isCalendarOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [isOpen]);
 
   return (
     <div
@@ -47,7 +66,8 @@ const UnlockOn = () => {
       {/* options */}
       {isOpen && (
         <ul
-          className="w-full top-full mt-2.5 bg-primary-700 rounded-lg shadow-card z-10 overflow-hidden p-1.25"
+          ref={optionsRef}
+          className="w-full top-full mt-2.5 bg-primary-700 rounded-lg shadow-card z-10 overflow-hidden p-1.25 mb-15"
           role="listbox"
           id="listbox"
         >
@@ -73,7 +93,11 @@ const UnlockOn = () => {
       )}
 
       {/* calendar */}
-      {isCalendarOpen && <Calendar />}
+      {isCalendarOpen && (
+        <div ref={calendarRef} className="mb-10">
+          <Calendar />
+        </div>
+      )}
     </div>
   );
 };

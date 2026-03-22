@@ -67,3 +67,14 @@ body {
 .slider::-moz-range-thumb {
   @apply w-[27px] h-[27px] bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
 }
+
+
+.time{
+  appearance: none;
+  -webkit-appearance: none; 
+  -moz-appearance: none;
+}
+.time::-webkit-calendar-picker-indicator{
+  display: none !important;
+  appearance: none;
+}
