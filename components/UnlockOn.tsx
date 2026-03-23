@@ -54,7 +54,12 @@ const UnlockOn = () => {
         ref={triggerRef}
         aria-label={`Unlock dudration, currently ${selected}`}
         className="bg-primary-700 px-5 py-3 max-sm:py-2 shadow-card rounded-lg cursor-pointer flex items-center justify-between w-full focus:outline-none focus:ring focus:ring-primary-400"
-        onClick={() => setisOpen(!isOpen)}
+        onClick={() => {
+          setisOpen(!isOpen);
+          if (isCalendarOpen) {
+            setIsCalendarOpen(false);
+          }
+        }}
         onKeyDown={handleKeyDown}
       >
         <span aria-hidden="true">{selected}</span>

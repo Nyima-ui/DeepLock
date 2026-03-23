@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ChevronLeft from "./svgs/ChevronLeft";
 import ChevronRight from "./svgs/ChevronRight";
 import Timer from "./svgs/Timer";
@@ -10,15 +10,10 @@ interface LockDuration {
   endDate: Date | null;
 }
 
-interface Time {
-  hour: string;
-  minutes: string;
-  seconds: string;
-}
-
 const Calendar = () => {
-  const [todaysDate, setTodaysDate] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const todaysDate = new Date();
+  todaysDate.setHours(0, 0, 0, 0);
+
 
   const [lockDuration, setlockDuration] = useState<LockDuration>(() => {
     const normalized = new Date();
@@ -69,12 +64,17 @@ const Calendar = () => {
     }
   }
 
-  const weeks: (typeof cells)[] = []; 
-  
+  const weeks: (typeof cells)[] = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7));
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   return (
     <section
-      className="w-auto max-w-[368px] bg-card shadow-card rounded-lg p-[15px] mt-[40px]"
+      className="w-auto max-w-92 bg-card shadow-card rounded-lg p-3.75 mt-10"
       aria-label="Date and time picker"
     >
       {/* header  */}
@@ -103,9 +103,9 @@ const Calendar = () => {
       </header>
 
       {/* select todays date  */}
-      <div className="flex justify-between mt-[20px] gap-[10px]">
+      <div className="flex justify-between mt-5 gap-2.5">
         <span
-          className="px-[12px] py-[6px] rounded-lg select-none focus:outline-none bg-card shadow-[2px_0px_6px_0px_rgba(55,39,114,0.9)] text-base flex-1"
+          className="px-3 py-1.5 rounded-lg select-none focus:outline-none bg-card shadow-[2px_0px_6px_0px_rgba(55,39,114,0.9)] text-base flex-1"
           aria-label="Selected date range"
         >
           {lockDuration.endDate
@@ -114,7 +114,7 @@ const Calendar = () => {
         </span>
         <button
           aria-label="Reset to today"
-          className="bg-primary px-[9px] py-[6px] rounded-lg cursor-pointer hover:bg-primary/90 transition duration-200 ease-in text-base"
+          className="bg-primary px-2.25 py-1.5 rounded-lg cursor-pointer hover:bg-primary/90 transition duration-200 ease-in text-base"
           onClick={() => {
             const now = new Date();
             now.setHours(0, 0, 0, 0);
@@ -129,16 +129,16 @@ const Calendar = () => {
       </div>
 
       {/* calendar grid  */}
-      <div className="mt-[20px] text-base">
+      <div className="mt-5 text-base">
         <div
-          className="grid grid-cols-[repeat(7,50px)]"
+          className="grid grid-cols-[repeat(7,48px)]"
           role="grid"
           aria-label="Calendar"
         >
           {["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"].map((day) => (
             <div
               key={day}
-              className="font-semibold select-none"
+              className="font-semibold select-none text-center"
               aria-label={day}
               role="columnheader"
             >
@@ -147,70 +147,86 @@ const Calendar = () => {
           ))}
         </div>
 
-        <div
-          className="grid 
-        grid-cols-[repeat(7,48px)]
-        auto-rows-[48px]
-        gap-y-1
-         mt-[15px]"
-        >
-          {cells.map((cell, i) => {
-            const isToday =
-              cell.day === todaysDate.getDate() &&
-              viewMonth === todaysDate.getMonth() &&
-              viewYear === todaysDate.getFullYear() &&
-              cell.currentMonth;
+        <div className="mt-3.75 flex flex-col gap-y-1">
+          {weeks.map((week, wi) => (
+            <div
+              key={wi}
+              role="row"
+              className="grid grid-cols-[repeat(7,48px)] auto-rows-[48px]"
+            >
+              {week.map((cell, ci) => {
+                const isToday =
+                  cell.currentMonth &&
+                  cell.date.toDateString() === todaysDate.toDateString();
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const pastDate = cell.date < today;
+                const pastDate = cell.date < today;
 
-            const isInRange =
-              lockDuration.endDate &&
-              cell.date > lockDuration.startDate &&
-              cell.date < lockDuration.endDate;
+                const isInRange =
+                  lockDuration.endDate &&
+                  cell.date > lockDuration.startDate &&
+                  cell.date < lockDuration.endDate;
 
-            const isRangeEnd =
-              lockDuration.endDate &&
-              cell.date.toDateString() === lockDuration.endDate.toDateString();
+                const isRangeEnd =
+                  lockDuration.endDate &&
+                  cell.date.toDateString() ===
+                    lockDuration.endDate.toDateString();
 
-            const isRangeStart =
-              lockDuration.endDate &&
-              cell.date.toDateString() ===
-                lockDuration.startDate.toDateString();
+                const isRangeStart =
+                  lockDuration.endDate &&
+                  cell.date.toDateString() ===
+                    lockDuration.startDate.toDateString();
 
-            const dayOfWeek = cell.date.getDay();
-            const isWeekStart = dayOfWeek === 1;
-            const isWeekEnd = dayOfWeek === 0;
+                if (isRangeStart) {
+                  console.log(cell.date.toDateString());
+                }
 
-            const isLeftCap = isRangeStart || (isInRange && isWeekStart);
-            const isRightCap = isRangeEnd || (isInRange && isWeekEnd);
-            const isMidRange = isInRange && !isLeftCap && !isRightCap;
+                const daysOfWeek = cell.date.getDay();
+                const isWeekStart = daysOfWeek === 1;
+                const isWeekEnd = daysOfWeek === 0;
 
-            return (
-              <button
-                key={i}
-                disabled={pastDate}
-                className={`size-full flex items-center justify-center  select-none
-                ${cell.currentMonth ? "" : "text-foreground/60"} 
-                ${isToday ? "bg-primary rounded-lg" : ""}
-                ${isInRange ? "bg-primary-500" : ""}
-                ${isRangeEnd ? "bg-primary-500" : ""}
-                ${pastDate ? "cursor-not-allowed opacity-40" : "cursor-pointer"}
-                ${!isToday && !isInRange && !isRangeEnd && !pastDate ? "hover:bg-primary-500" : ""}
-                ${isLeftCap ? "rounded-l-lg" : ""}
-                ${isRightCap ? "rounded-r-lg" : ""}
-                ${!isToday && !isInRange && !isRangeEnd ? "rounded-lg" : ""}
-                `}
-                onClick={() => {
-                  setSelectedDate(cell.date);
-                  setlockDuration((prev) => ({ ...prev, endDate: cell.date }));
-                }}
-              >
-                {cell.day}
-              </button>
-            );
-          })}
+                const isLeftCap = isRangeStart || (isInRange && isWeekStart);
+                const isRightCap = isRangeEnd || (isInRange && isWeekEnd);
+
+                const ariaLabel = `${cell.date.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}${isToday ? ", today" : ""}${pastDate ? ", unavailable" : ""}${isRangeStart ? ", range start" : ""}${isRangeEnd ? ", range end" : ""}`;
+
+                return (
+                  <div key={ci} role="gridcell">
+                    <button
+                      disabled={pastDate}
+                      aria-label={ariaLabel}
+                      aria-pressed={
+                        isRangeStart || isRangeEnd ? true : undefined
+                      }
+                      aria-disabled={pastDate}
+                      className={`size-full flex items-center justify-center select-none
+                      ${cell.currentMonth ? "" : "text-foreground/60"} 
+                      ${isToday ? `bg-primary ${!lockDuration.endDate ? "rounded-lg" : "rounded-l-lg"}` : ""}
+                      ${isInRange ? "bg-primary-500" : ""}
+                      ${isRangeEnd ? "bg-primary-500" : ""}
+                      ${pastDate ? "cursor-not-allowed opacity-40" : "cursor-pointer"}
+                      ${!isToday && !isInRange && !isRangeEnd && !pastDate ? "hover:bg-primary-500" : ""}
+                      ${isLeftCap ? "rounded-l-lg" : ""}
+                      ${isRightCap ? "rounded-r-lg" : ""}
+                      ${!isToday && !isInRange && !isRangeEnd && !isRangeStart ? "rounded-lg" : ""}
+                      `}
+                      onClick={() => {
+                        setlockDuration((prev) => ({
+                          ...prev,
+                          endDate: cell.date,
+                        }));
+                      }}
+                    >
+                      {cell.day}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
       <p className="text-xs mt-3 text-foreground/70 tracking-wide">
@@ -220,11 +236,11 @@ const Calendar = () => {
       <hr className="border border-primary-700 mt-2" />
 
       {/* time  */}
-      <div className="mt-[15px]">
-        <p className="text-base">End time</p>
+      <fieldset className="mt-3.75 border-0 p-0 m-0">
+        <legend className="text-base">End time</legend>
 
-        <div className="mt-[10px] flex items-center gap-[10px] bg-primary-900 p-[10px] rounded-lg focus-within:bg-primary-500 transition-colors duration-150 shadow-card focus-within:shadow-btn">
-          <span>
+        <div className="mt-2.5 flex items-center gap-2.5 bg-primary-900 p-2.5 rounded-lg focus-within:bg-primary-500 transition-colors duration-150 shadow-card focus-within:shadow-btn">
+          <span aria-hidden="true">
             <Timer />
           </span>
           <input
@@ -233,11 +249,11 @@ const Calendar = () => {
             defaultValue="10:30:00"
             lang="en-US"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none
-            flex-1 focus:outline-none
-            "
+            flex-1 focus:outline-none"
+            aria-label="End time"
           />
         </div>
-      </div>
+      </fieldset>
     </section>
   );
 };
