@@ -11,6 +11,7 @@ import { generatePassword } from "@/lib/password-generator";
 import { getDurationInSeconds } from "@/lib/Utils";
 import type { Options } from "@/types/types";
 import { CustomLockDurationProps } from "@/types/types";
+import { getCustomDurationInSeconds } from "@/lib/Utils";
 
 const PassswordGenerator = dynamic(
   () => import("@/components/PasswordGenerator"),
@@ -50,11 +51,18 @@ const Page = () => {
 
   async function handleEncrypt() {
     if (activeTab !== "encrypt") return;
-    const durationInSec = getDurationInSeconds(duration);
-    console.log(password, durationInSec);
+    let durationInSec = 0;
+
+    if (duration === "custom" && customDuration.endDate) {
+      durationInSec = getCustomDurationInSeconds(customDuration);
+      console.log(durationInSec);
+    } else {
+      durationInSec = getDurationInSeconds(duration);
+      // console.log(password, durationInSec);
+    }
     // try {
     //   const currentRound = await getCurrentRound();
-    //   const futureRound = calculateFutureRound2(durationInSec, currentRound);
+    // const futureRound = calculateFutureRound2(durationInSec, currentRound);
     //   const data = await encryptPassword(password, futureRound);
     //   setEncryptedKey({
     //     accessKey: data.encryptedData,
@@ -66,7 +74,7 @@ const Page = () => {
   }
 
   useEffect(() => {
-    console.log(customDuration);
+    // console.log(customDuration);
   }, [customDuration]);
   return (
     <main className="bg-background text-foreground min-h-screen px-36 max-lg:px-10 max-md:px-5 py-7 flex justify-between max-xl:flex-col gap-5 pb-20">

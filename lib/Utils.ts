@@ -1,6 +1,7 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { type Options } from "@/types/types";
+import { CustomLockDurationProps } from "@/types/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,4 +27,25 @@ export function getDurationInSeconds(
     default:
       return 0;
   }
+}
+
+/*
+ @Params: e.g: 
+*/
+
+export function getCustomDurationInSeconds(
+  duration: CustomLockDurationProps,
+): number {
+  if (!duration.endDate) return 0;
+
+  const [hours, minutes, seconds] = duration.endTime.split(":").map(Number);
+
+  const end = new Date(duration.endDate);
+  end.setHours(hours, minutes, seconds, 0);
+
+  const diffMs = end.getTime() - duration.startDate.getTime();
+
+  if (diffMs <= 0) return 0;
+
+  return Math.floor(diffMs / 1000);
 }

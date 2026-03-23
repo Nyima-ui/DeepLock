@@ -171,10 +171,6 @@ const Calendar = ({ customDuration, setCustomDuration }: CalendarProps) => {
                   cell.date.toDateString() ===
                     customDuration.startDate.toDateString();
 
-                if (isRangeStart) {
-                  console.log(cell.date.toDateString());
-                }
-
                 const daysOfWeek = cell.date.getDay();
                 const isWeekStart = daysOfWeek === 1;
                 const isWeekEnd = daysOfWeek === 0;
