@@ -10,6 +10,7 @@ const UnlockOn = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLUListElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   function handleSelect(option: string) {
     setSelected(option);
@@ -40,8 +41,22 @@ const UnlockOn = () => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setisOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       className="text-[20px] mt-9.5 max-xl:mt-4 relative"
       role="combobox"
       aria-haspopup="listbox"
@@ -72,7 +87,7 @@ const UnlockOn = () => {
       {isOpen && (
         <ul
           ref={optionsRef}
-          className="w-full top-full mt-2.5 bg-primary-700 rounded-lg shadow-card z-10 overflow-hidden p-1.25 mb-15"
+          className="w-full top-full mt-2.5 bg-primary-700 rounded-lg shadow-card z-10 overflow-hidden p-1.25"
           role="listbox"
           id="listbox"
         >
