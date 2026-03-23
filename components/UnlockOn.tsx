@@ -2,20 +2,34 @@
 import { useEffect, useRef, useState } from "react";
 import ChevronDown from "./svgs/ChevronDown";
 import Calendar from "./Calendar";
+import type { Options, CustomLockDurationProps } from "@/types/types";
 
-const UnlockOn = () => {
+interface UnlockOnProps {
+  duration: string;
+  setDuration: (val: Options) => void;
+  customDuration: CustomLockDurationProps;
+  setCustomDuration: React.Dispatch<
+    React.SetStateAction<CustomLockDurationProps>
+  >;
+}
+
+const UnlockOn = ({
+  duration,
+  setDuration,
+  customDuration,
+  setCustomDuration,
+}: UnlockOnProps) => {
   const [isOpen, setisOpen] = useState(false);
-  const [selected, setSelected] = useState("1 hour");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLUListElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  function handleSelect(option: string) {
-    setSelected(option);
+  function handleSelect(option: Options) {
+    setDuration(option);
     setisOpen(false);
-    if (option === "Custom") {
+    if (option === "custom") {
       setIsCalendarOpen(true);
     } else {
       setIsCalendarOpen(false);
@@ -27,7 +41,14 @@ const UnlockOn = () => {
     if (e.key === "Escape") setisOpen(false);
   }
 
-  const options = ["1 hour", "6 hours", "1 day", "3 days", "1 week", "Custom"];
+  const options: Options[] = [
+    "1 hour",
+    "6 hours",
+    "1 day",
+    "3 days",
+    "1 week",
+    "custom",
+  ];
 
   useEffect(() => {
     if (isCalendarOpen) {
@@ -67,7 +88,7 @@ const UnlockOn = () => {
       {/* trigger */}
       <button
         ref={triggerRef}
-        aria-label={`Unlock dudration, currently ${selected}`}
+        aria-label={`Unlock dudration, currently ${duration}`}
         className="bg-primary-700 px-5 py-3 max-sm:py-2 shadow-card rounded-lg cursor-pointer flex items-center justify-between w-full focus:outline-none focus:ring focus:ring-primary-400"
         onClick={() => {
           setisOpen(!isOpen);
@@ -77,7 +98,11 @@ const UnlockOn = () => {
         }}
         onKeyDown={handleKeyDown}
       >
-        <span aria-hidden="true">{selected}</span>
+        <span aria-hidden="true">
+          {duration === "custom"
+            ? duration.charAt(0).toUpperCase() + duration.slice(1)
+            : duration}
+        </span>
         <span className={`transition-transform ${isOpen ? "rotate-180" : ""}`}>
           <ChevronDown />
         </span>
@@ -95,7 +120,7 @@ const UnlockOn = () => {
             <li
               key={option}
               role="option"
-              aria-selected={selected === option}
+              aria-selected={duration === option}
               tabIndex={0}
               className="px-2.5 py-2 max-sm:py-1.5 hover:bg-primary-500 select-none rounded-lg"
               onClick={() => handleSelect(option)}
@@ -106,7 +131,9 @@ const UnlockOn = () => {
                 }
               }}
             >
-              {option}
+              {option === "custom"
+                ? option.charAt(0).toUpperCase() + option.slice(1)
+                : option}
             </li>
           ))}
         </ul>
@@ -115,7 +142,10 @@ const UnlockOn = () => {
       {/* calendar */}
       {isCalendarOpen && (
         <div ref={calendarRef} className="mb-10">
-          <Calendar />
+          <Calendar
+            customDuration={customDuration}
+            setCustomDuration={setCustomDuration}
+          />
         </div>
       )}
     </div>

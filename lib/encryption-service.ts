@@ -1,6 +1,15 @@
 "use client";
 
-export async function encryptPassword(password: string, futureRound: number) {
+interface EncryptResponse {
+  success: boolean;
+  encryptedData: string;
+  unlockRound: number;
+}
+
+export async function encryptPassword(
+  password: string,
+  futureRound: number,
+): Promise<EncryptResponse> {
   const response = await fetch("/api/encrypt", {
     method: "POST",
     headers: {
@@ -18,7 +27,7 @@ export async function encryptPassword(password: string, futureRound: number) {
     throw new Error(data.error || "Encryption failed");
   }
 
-  return data
+  return data;
 }
 
 export async function decryptPassword(encryptedData: string) {

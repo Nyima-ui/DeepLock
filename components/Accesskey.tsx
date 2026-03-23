@@ -1,4 +1,5 @@
 import LongButton from "./LongButton";
+import { EncryptedData } from "@/app/page";
 
 const dummyKey = `-----BEGIN AGE ENCRYPTED FILE-----
 YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHRsb2NrIDI2NDA3NjQzIDUyZGI5YmE3
@@ -14,7 +15,11 @@ aDhHZDRnRGdHdXU0dFloMG9lUlRLaEVVOXJjdVFDQkR3SUs4ZwquQcU4B0pMyL/o
 cZLo4a76Pdv4HNcjYJTaLkTa2beSZeCZflKVQwbUFmW2iauAy0Y=
 -----END AGE ENCRYPTED FILE-----`;
 
-const Accesskey = () => {
+interface AccessKeyProps {
+  encryptionData: EncryptedData;
+}
+
+const Accesskey = ({ encryptionData }: AccessKeyProps) => {
   return (
     <section
       aria-labelledby="access-key-heading"
@@ -29,7 +34,7 @@ const Accesskey = () => {
         tabIndex={0}
         className="whitespace-pre-wrap break-all shadow-sm shadow-primary-600 rounded-lg max-w-171.25 p-3.75 max-sm:text-sm font-mono"
       >
-        <code>{dummyKey}</code>
+        <code>{encryptionData.accessKey}</code>
       </pre>
 
       <p className="max-md:text-sm">

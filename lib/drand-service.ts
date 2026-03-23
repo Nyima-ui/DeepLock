@@ -18,6 +18,14 @@ export function calculateFutureRound(currentRound: number, unlockDate: Date) {
   return currentRound + roundsToAdd;
 }
 
+export function calculateFutureRound2(
+  seconds: number,
+  currentRound: number,
+): number {
+  const roundsToAdd = Math.floor(seconds / SECONDS_PER_ROUND);
+  return currentRound + roundsToAdd;
+}
+
 export function parseDateTimeInput(
   date: string,
   hour: string,

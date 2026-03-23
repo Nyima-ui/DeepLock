@@ -1,9 +1,12 @@
 "use client";
-
 import { useState } from "react";
 
-const Tab = () => {
-  const [activeTab, setActiveTab] = useState<"encrypt" | "decrypt">("encrypt");
+interface TabProps {
+  activeTab: "encrypt" | "decrypt";
+  setActiveTab: (val: "encrypt" | "decrypt") => void;
+}
+
+const Tab = ({ activeTab, setActiveTab }: TabProps) => {
   return (
     <div
       className="bg-primary-700 rounded-lg flex items-center mt-7.5 p-1.5 relative gap-3.5"

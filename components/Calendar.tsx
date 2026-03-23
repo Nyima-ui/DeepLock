@@ -4,25 +4,18 @@ import { useState } from "react";
 import ChevronLeft from "./svgs/ChevronLeft";
 import ChevronRight from "./svgs/ChevronRight";
 import Timer from "./svgs/Timer";
+import type { CustomLockDurationProps } from "@/types/types";
 
-interface LockDuration {
-  startDate: Date;
-  endDate: Date | null;
+interface CalendarProps {
+  customDuration: CustomLockDurationProps;
+  setCustomDuration: React.Dispatch<
+    React.SetStateAction<CustomLockDurationProps>
+  >;
 }
 
-const Calendar = () => {
+const Calendar = ({ customDuration, setCustomDuration }: CalendarProps) => {
   const todaysDate = new Date();
   todaysDate.setHours(0, 0, 0, 0);
-
-
-  const [lockDuration, setlockDuration] = useState<LockDuration>(() => {
-    const normalized = new Date();
-    normalized.setHours(0, 0, 0, 0);
-    return {
-      startDate: normalized,
-      endDate: null,
-    };
-  });
 
   const [viewDate, setViewDate] = useState(new Date());
   const viewYear = viewDate.getFullYear();
@@ -108,9 +101,9 @@ const Calendar = () => {
           className="px-3 py-1.5 rounded-lg select-none focus:outline-none bg-card shadow-[2px_0px_6px_0px_rgba(55,39,114,0.9)] text-base flex-1"
           aria-label="Selected date range"
         >
-          {lockDuration.endDate
-            ? `${lockDuration.startDate.toLocaleString("en-US", { month: "long", day: "numeric" })} - ${lockDuration.endDate.toLocaleString("en-US", { month: "long", day: "numeric" })}`
-            : `${lockDuration.startDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`}
+          {customDuration.endDate
+            ? `${customDuration.startDate.toLocaleString("en-US", { month: "long", day: "numeric" })} - ${customDuration.endDate.toLocaleString("en-US", { month: "long", day: "numeric" })}`
+            : `${customDuration.startDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`}
         </span>
         <button
           aria-label="Reset to today"
@@ -119,9 +112,11 @@ const Calendar = () => {
             const now = new Date();
             now.setHours(0, 0, 0, 0);
             setViewDate(new Date());
-
-            // setSelectedDate(new Date());
-            setlockDuration({ startDate: now, endDate: null });
+            setCustomDuration({
+              startDate: now,
+              endDate: null,
+              endTime: "00:00:00",
+            });
           }}
         >
           Today
@@ -162,19 +157,19 @@ const Calendar = () => {
                 const pastDate = cell.date < today;
 
                 const isInRange =
-                  lockDuration.endDate &&
-                  cell.date > lockDuration.startDate &&
-                  cell.date < lockDuration.endDate;
+                  customDuration.endDate &&
+                  cell.date > customDuration.startDate &&
+                  cell.date < customDuration.endDate;
 
                 const isRangeEnd =
-                  lockDuration.endDate &&
+                  customDuration.endDate &&
                   cell.date.toDateString() ===
-                    lockDuration.endDate.toDateString();
+                    customDuration.endDate.toDateString();
 
                 const isRangeStart =
-                  lockDuration.endDate &&
+                  customDuration.endDate &&
                   cell.date.toDateString() ===
-                    lockDuration.startDate.toDateString();
+                    customDuration.startDate.toDateString();
 
                 if (isRangeStart) {
                   console.log(cell.date.toDateString());
@@ -204,7 +199,7 @@ const Calendar = () => {
                       aria-disabled={pastDate}
                       className={`size-full flex items-center justify-center select-none
                       ${cell.currentMonth ? "" : "text-foreground/60"} 
-                      ${isToday ? `bg-primary ${!lockDuration.endDate ? "rounded-lg" : "rounded-l-lg"}` : ""}
+                      ${isToday ? `bg-primary ${!customDuration.endDate ? "rounded-lg" : "rounded-l-lg"}` : ""}
                       ${isInRange ? "bg-primary-500" : ""}
                       ${isRangeEnd ? "bg-primary-500" : ""}
                       ${pastDate ? "cursor-not-allowed opacity-40" : "cursor-pointer"}
@@ -214,7 +209,7 @@ const Calendar = () => {
                       ${!isToday && !isInRange && !isRangeEnd && !isRangeStart ? "rounded-lg" : ""}
                       `}
                       onClick={() => {
-                        setlockDuration((prev) => ({
+                        setCustomDuration((prev) => ({
                           ...prev,
                           endDate: cell.date,
                         }));
@@ -246,7 +241,13 @@ const Calendar = () => {
           <input
             type="time"
             step={1}
-            defaultValue="10:30:00"
+            value={customDuration.endTime}
+            onChange={(e) =>
+              setCustomDuration((prev) => ({
+                ...prev,
+                endTime: e.target.value,
+              }))
+            }
             lang="en-US"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none
             flex-1 focus:outline-none"

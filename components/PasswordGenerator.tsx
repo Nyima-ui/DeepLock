@@ -7,13 +7,15 @@ import Checked from "@/components/svgs/Checked";
 import { generatePassword } from "@/lib/password-generator";
 import { type Character } from "@/lib/password-generator";
 
-const PassswordGenerator = () => {
-  const [password, setPassword] = useState(() => {
-    return generatePassword({
-      characters: ["uppercase", "lowercase", "numbers"],
-      length: 16,
-    });
-  });
+interface PassswordGeneratorProps {
+  password: string;
+  setPassword: (value: string) => void;
+}
+
+const PassswordGenerator = ({
+  password,
+  setPassword,
+}: PassswordGeneratorProps) => {
   const [length, setLength] = useState(16);
   const [copied, setCopied] = useState(false);
 
