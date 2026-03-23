@@ -16,7 +16,7 @@ const Tab = () => {
 
       <button
         onClick={() => setActiveTab("encrypt")}
-        className="cursor-pointer flex-1 py-1.5 relative z-10"
+        className="cursor-pointer flex-1 py-1.5 relative z-10 text-lg"
         role="tab"
         aria-selected={activeTab === "encrypt"}
         aria-controls="encrypt-panel"
@@ -28,7 +28,7 @@ const Tab = () => {
         role="tab"
         aria-selected={activeTab === "decrypt"}
         aria-controls="decrypt-panel"
-        className="cursor-pointer flex-1 py-1.5 relative z-10"
+        className="cursor-pointer flex-1 py-1.5 relative z-10 text-lg"
       >
         Decrypt
       </button>

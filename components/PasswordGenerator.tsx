@@ -99,7 +99,7 @@ const PassswordGenerator = () => {
 
       {/* length setter  */}
       <div className="flex items-center justify-between max-sm:flex-col max-sm:items-start gap-5 max-sm:gap-5">
-        <div className="text-[20px]">
+        <div className="text-[20px] w-47.5">
           <label htmlFor="password-length">Password length:</label>
           <span className="ml-0.5" aria-live="polite">
             {length}
