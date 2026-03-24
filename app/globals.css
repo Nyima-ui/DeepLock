@@ -9,7 +9,7 @@ body {
 :root {
   --background: #0a0b10;
   /* --foreground: #d9d7d9; */
-  --foreground: #CDCBCD;
+  --foreground: #cdcbcd;
   --card: #191a33;
 
   --primary-50: #a186ac;
@@ -71,12 +71,30 @@ body {
 }
 
 
-.time{
+.time {
   appearance: none;
-  -webkit-appearance: none; 
+  -webkit-appearance: none;
   -moz-appearance: none;
 }
-.time::-webkit-calendar-picker-indicator{
+.time::-webkit-calendar-picker-indicator {
   display: none !important;
   appearance: none;
+}
+
+
+
+.scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 999px;
+  cursor: auto;
 }
