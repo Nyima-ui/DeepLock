@@ -1,5 +1,7 @@
+"use client";
 import LongButton from "./LongButton";
 import { EncryptedData } from "@/app/page";
+import { useState } from "react";
 
 const dummyKey = `-----BEGIN AGE ENCRYPTED FILE-----
 YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHRsb2NrIDI2NDA3NjQzIDUyZGI5YmE3
@@ -17,9 +19,17 @@ cZLo4a76Pdv4HNcjYJTaLkTa2beSZeCZflKVQwbUFmW2iauAy0Y=
 
 interface AccessKeyProps {
   encryptionData: EncryptedData;
+  lockedUntil: string | null;
 }
 
-const Accesskey = ({ encryptionData }: AccessKeyProps) => {
+const Accesskey = ({ encryptionData, lockedUntil }: AccessKeyProps) => {
+  const [copied, setCopied] = useState(false);
+  async function handleCopy() {
+    if (!encryptionData.accessKey) return;
+    await navigator.clipboard.writeText(encryptionData.accessKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 5000);
+  }
   return (
     <section
       aria-labelledby="access-key-heading"
@@ -42,8 +52,10 @@ const Accesskey = ({ encryptionData }: AccessKeyProps) => {
           Save this key now — it can&apos;t be recovered once you leave.
         </p>
         <p className="max-md:text-sm mt-[8px]">
-          Your password unlocks at drand network round $
-          {encryptionData.unlockRound}
+          Your password unlocks at round - {' '}
+          <span className="font-bold">{encryptionData.unlockRound}</span> 
+          <span>: </span>
+          <span className="font-semibold">{lockedUntil ? lockedUntil : ""}</span>
         </p>
       </div>
 
@@ -55,10 +67,11 @@ const Accesskey = ({ encryptionData }: AccessKeyProps) => {
       />
 
       <LongButton
-        text="Copy key"
+        text={copied ? "Copied" : "Copy key"}
         className="mt-0"
         aria-label="Copy acccess key to clipboard"
         aria-describedby="copy-status"
+        onClick={handleCopy}
       />
     </section>
   );

@@ -4,6 +4,8 @@ import Success from "@/components/svgs/Success";
 import { createContext, useContext, useState } from "react";
 import { cn } from "@/lib/Utils";
 
+const TOAST_DURATION = 8000;
+
 interface ToastConfig {
   title: string;
   message: string;
@@ -19,9 +21,14 @@ const ToastContext = createContext<ToastContextProps | null>(null);
 
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [toastConfig, setToastConfig] = useState<ToastConfig | null>(null);
 
   function showToast(toastConfig: ToastConfig) {
     setIsVisible(true);
+    setToastConfig(toastConfig);
+    setTimeout(() => {
+      setIsVisible(false);
+    }, TOAST_DURATION);
   }
   function hideToast() {
     setIsVisible(false);
@@ -30,7 +37,13 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ToastContext.Provider value={{ showToast, hideToast }}>
       {children}
-      {<ToastNotification isVisible={isVisible} setIsVisible={setIsVisible} />}
+      {
+        <ToastNotification
+          isVisible={isVisible}
+          setIsVisible={setIsVisible}
+          config={toastConfig}
+        />
+      }
     </ToastContext.Provider>
   );
 };
@@ -48,11 +61,13 @@ export function useToast() {
 interface ToastNotificationProps {
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  config: ToastConfig | null;
 }
 
 function ToastNotification({
   isVisible,
   setIsVisible,
+  config,
 }: ToastNotificationProps) {
   return (
     <div
@@ -69,7 +84,7 @@ function ToastNotification({
           <span aria-hidden="true">
             <Success />
           </span>
-          <span className="text-[18px] font-semibold">Password Locked</span>
+          <span className="text-[18px] font-semibold">{config?.title}</span>
         </div>
         <button
           aria-label="Dismiss notification"
@@ -80,7 +95,7 @@ function ToastNotification({
         </button>
       </div>
       <div className="ml-10 mt-1.5">
-        <p>Your access key is ready. Locked until: March 28, 2026 at 9:00 AM</p>
+        <p>{config?.message}</p>
       </div>
     </div>
   );

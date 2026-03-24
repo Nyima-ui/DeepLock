@@ -29,10 +29,6 @@ export function getDurationInSeconds(
   }
 }
 
-/*
- @Params: e.g: 
-*/
-
 export function getCustomDurationInSeconds(
   duration: CustomLockDurationProps,
 ): number {
@@ -48,4 +44,22 @@ export function getCustomDurationInSeconds(
   if (end <= now) return -1;
 
   return Math.floor((end.getTime() - now.getTime()) / 1000);
+}
+
+export function getLockedUntil(durationInSeconds: number): string {
+  const unlockDate = new Date(Date.now() + durationInSeconds * 1000);
+
+  const date = unlockDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const time = unlockDate.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${date} at ${time}`;
 }

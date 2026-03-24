@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { getCurrentRound, calculateFutureRound2 } from "@/lib/drand-service";
 import { encryptPassword } from "@/lib/encryption-service";
 import { generatePassword } from "@/lib/password-generator";
-import { getDurationInSeconds } from "@/lib/Utils";
+import { getDurationInSeconds, getLockedUntil } from "@/lib/Utils";
 import type { Options } from "@/types/types";
 import { CustomLockDurationProps } from "@/types/types";
 import { getCustomDurationInSeconds } from "@/lib/Utils";
@@ -52,15 +52,12 @@ const Page = () => {
       };
     },
   );
+  const [lockedUntil, setlockedUntil] = useState<string | null>(null);
   const { showToast, hideToast } = useToast();
 
   async function handleEncrypt() {
-    showToast({ message: "asdkf", title: "asdf" });
-    return
     if (activeTab !== "encrypt") return;
     let durationInSec = 0;
-
-    setisEncrypted(true);
 
     if (duration === "custom" && !customDuration.endDate) {
       alert("Please select an end date from the calendar.");
@@ -75,19 +72,30 @@ const Page = () => {
       }
     } else {
       durationInSec = getDurationInSeconds(duration);
-      // console.log(password, durationInSec);
     }
-    // try {
-    //   const currentRound = await getCurrentRound();
-    // const futureRound = calculateFutureRound2(durationInSec, currentRound);
-    //   const data = await encryptPassword(password, futureRound);
-    //   setEncryptedKey({
-    //     accessKey: data.encryptedData,
-    //     unlockRound: data.unlockRound,
-    //   });
-    // } catch (error) {
-    //   console.error(`Error encrypting your password`, error);
-    // }
+    try {
+      const currentRound = await getCurrentRound();
+      const futureRound = calculateFutureRound2(durationInSec, currentRound);
+      const data = await encryptPassword(password, futureRound);
+      setEncryptedKey({
+        accessKey: data.encryptedData,
+        unlockRound: data.unlockRound,
+      });
+      showToast({
+        title: "Password Locked",
+        message: `Your access key is ready. Locked until: ${getLockedUntil(durationInSec)}`,
+        type: "success",
+      });
+      setlockedUntil(getLockedUntil(durationInSec));
+      setisEncrypted(true);
+    } catch (error) {
+      console.error(`Error encrypting your password`, error);
+      showToast({
+        title: "Encryption failed",
+        message: "Something went wrong. Please try again.",
+        type: "failure",
+      });
+    }
   }
 
   useEffect(() => {
@@ -108,7 +116,12 @@ const Page = () => {
               onClick={() => handleEncrypt()}
             />
           )}
-          {isEncrypted && <Accesskey encryptionData={encryptedKey} />}
+          {isEncrypted && (
+            <Accesskey
+              encryptionData={encryptedKey}
+              lockedUntil={lockedUntil}
+            />
+          )}
         </div>
         <div className="flex-1 max-w-100 mt-0 max-xl:mt-9">
           <h2 className="text-[31px] max-lg:text-[28px] max-sm:text-[25px]">
@@ -123,31 +136,38 @@ const Page = () => {
         </div>
       </main>
 
-      <footer className="px-36 max-lg:px-10 max-md:px-5 py-7 border-t border-primary-50 mt-8">
-        <address className="not-italic">
-          <p>Built by Tenzin Nyima</p>
-          <Link href="mailto:ntenzin492@gmail.com" className="text-sm">
-            ntenzin492@gmail.com
-          </Link>
-          <Link
-            href="https://github.com/Nyima-ui/DeepLock"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="View DeepLock source code on GitHub, opends in new tab"
-            className="flex items-center gap-2 mt-4 group w-fit"
-          >
-            <span>
-              <Image height={32} width={32} src={"/github.svg"} alt="Github" />
-            </span>
-            <span>GitHub</span>
-            <span
-              aria-hidden="true"
-              className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-75 ease-in"
+      <footer className="px-36 max-lg:px-10 max-md:px-5 mt-10">
+        <div className="border-t border-primary-50 py-7">
+          <address className="not-italic">
+            <p>Built by Tenzin Nyima</p>
+            <Link href="mailto:ntenzin492@gmail.com" className="text-sm">
+              ntenzin492@gmail.com
+            </Link>
+            <Link
+              href="https://github.com/Nyima-ui/DeepLock"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View DeepLock source code on GitHub, opends in new tab"
+              className="flex items-center gap-2 mt-4 group w-fit"
             >
-              <NorthEast />
-            </span>
-          </Link>
-        </address>
+              <span>
+                <Image
+                  height={32}
+                  width={32}
+                  src={"/github.svg"}
+                  alt="Github"
+                />
+              </span>
+              <span>GitHub</span>
+              <span
+                aria-hidden="true"
+                className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-75 ease-in"
+              >
+                <NorthEast />
+              </span>
+            </Link>
+          </address>
+        </div>
       </footer>
     </>
   );
