@@ -75,12 +75,12 @@ function ToastNotification({
       aria-live="polite"
       aria-atomic="true"
       className={cn(
-        "fixed top-[113px] right-[60px] max-sm:right-[20px] bg-primary-500 rounded-lg w-[386px] max-sm:w-[calc(400px-14px)] p-3.5 shadow-card transition-transform duration-300 linear",
+        "fixed top-28.25 right-15 max-sm:right-5 bg-primary-500 rounded-lg w-96.5 max-sm:w-96.5 p-3.5 shadow-card transition-transform duration-300 linear",
         isVisible ? "translate-x-0" : "translate-x-[calc(100%+60px)]",
       )}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-[15px]">
+        <div className="flex items-center gap-3.75">
           <span aria-hidden="true">
             <Success />
           </span>

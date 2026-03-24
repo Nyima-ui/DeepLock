@@ -5,7 +5,7 @@ import UnlockOn from "@/components/UnlockOn";
 import LongButton from "@/components/LongButton";
 import Accesskey from "@/components/Accesskey";
 import { useEffect, useState } from "react";
-import { getCurrentRound, calculateFutureRound2 } from "@/lib/drand-service";
+import { getCurrentRound, calculateFutureRound } from "@/lib/drand-service";
 import { encryptPassword, decryptPassword } from "@/lib/encryption-service";
 import { generatePassword } from "@/lib/password-generator";
 import { getDurationInSeconds, getLockedUntil } from "@/lib/Utils";
@@ -57,7 +57,7 @@ const Page = () => {
   const [lockedUntil, setlockedUntil] = useState<string | null>(null);
   const [inputAccessKey, setInputAccessKey] = useState<string>("");
   const [decrypted, setDecrypted] = useState(false);
-  const { showToast, hideToast } = useToast();
+  const { showToast } = useToast();
 
   async function handleEncrypt() {
     if (activeTab !== "encrypt") return;
@@ -79,7 +79,7 @@ const Page = () => {
     }
     try {
       const currentRound = await getCurrentRound();
-      const futureRound = calculateFutureRound2(durationInSec, currentRound);
+      const futureRound = calculateFutureRound(durationInSec, currentRound);
       const data = await encryptPassword(password, futureRound);
       setEncryptedKey({
         accessKey: data.encryptedData,

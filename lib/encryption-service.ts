@@ -48,10 +48,3 @@ export async function decryptPassword(encryptedData: string) {
   return data.password;
 }
 
-/*
-intput: password
-futureRound
-
-output: encrypted password
-
-*/
