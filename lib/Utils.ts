@@ -43,9 +43,9 @@ export function getCustomDurationInSeconds(
   const end = new Date(duration.endDate);
   end.setHours(hours, minutes, seconds, 0);
 
-  const diffMs = end.getTime() - duration.startDate.getTime();
+  const now = new Date();
 
-  if (diffMs <= 0) return 0;
+  if (end <= now) return -1;
 
-  return Math.floor(diffMs / 1000);
+  return Math.floor((end.getTime() - now.getTime()) / 1000);
 }

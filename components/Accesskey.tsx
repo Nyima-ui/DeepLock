@@ -37,9 +37,15 @@ const Accesskey = ({ encryptionData }: AccessKeyProps) => {
         <code>{encryptionData.accessKey}</code>
       </pre>
 
-      <p className="max-md:text-sm">
-        Save this key now — it can&apos;t be recovered once you leave.
-      </p>
+      <div>
+        <p className="max-md:text-sm">
+          Save this key now — it can&apos;t be recovered once you leave.
+        </p>
+        <p className="max-md:text-sm mt-[8px]">
+          Your password unlocks at drand network round $
+          {encryptionData.unlockRound}
+        </p>
+      </div>
 
       <div
         aria-live="polite"

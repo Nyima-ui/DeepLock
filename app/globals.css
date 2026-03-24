@@ -2,6 +2,8 @@
 
 body {
   font-family: var(--font-manrope), sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 :root {
