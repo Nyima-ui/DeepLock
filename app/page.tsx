@@ -15,6 +15,7 @@ import { getCustomDurationInSeconds } from "@/lib/Utils";
 import Link from "next/link";
 import Image from "next/image";
 import NorthEast from "@/components/svgs/NorthEast";
+import { useToast } from "@/context/ToastContext";
 
 const PassswordGenerator = dynamic(
   () => import("@/components/PasswordGenerator"),
@@ -51,8 +52,11 @@ const Page = () => {
       };
     },
   );
+  const { showToast, hideToast } = useToast();
 
   async function handleEncrypt() {
+    showToast({ message: "asdkf", title: "asdf" });
+    return
     if (activeTab !== "encrypt") return;
     let durationInSec = 0;
 
@@ -119,7 +123,7 @@ const Page = () => {
         </div>
       </main>
 
-      <footer className="px-36 max-lg:px-10 max-md:px-5 py-7 border-t border-primary-50 mt-10">
+      <footer className="px-36 max-lg:px-10 max-md:px-5 py-7 border-t border-primary-50 mt-8">
         <address className="not-italic">
           <p>Built by Tenzin Nyima</p>
           <Link href="mailto:ntenzin492@gmail.com" className="text-sm">
