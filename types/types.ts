@@ -11,3 +11,11 @@ export interface CustomLockDurationProps {
   endDate: Date | null;
   endTime: string;
 }
+
+export class DecryptError extends Error {
+  type: string;
+  constructor(type: string, message: string) {
+    super(message);
+    this.type = type;
+  }
+}

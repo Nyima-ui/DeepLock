@@ -6,11 +6,11 @@ import LongButton from "@/components/LongButton";
 import Accesskey from "@/components/Accesskey";
 import { useEffect, useState } from "react";
 import { getCurrentRound, calculateFutureRound2 } from "@/lib/drand-service";
-import { encryptPassword } from "@/lib/encryption-service";
+import { encryptPassword, decryptPassword } from "@/lib/encryption-service";
 import { generatePassword } from "@/lib/password-generator";
 import { getDurationInSeconds, getLockedUntil } from "@/lib/Utils";
 import type { Options } from "@/types/types";
-import { CustomLockDurationProps } from "@/types/types";
+import { CustomLockDurationProps, DecryptError } from "@/types/types";
 import { getCustomDurationInSeconds } from "@/lib/Utils";
 import Link from "next/link";
 import Image from "next/image";
@@ -56,6 +56,7 @@ const Page = () => {
   );
   const [lockedUntil, setlockedUntil] = useState<string | null>(null);
   const [inputAccessKey, setInputAccessKey] = useState<string>("");
+  const [decrypted, setDecrypted] = useState(false);
   const { showToast, hideToast } = useToast();
 
   async function handleEncrypt() {
@@ -101,6 +102,35 @@ const Page = () => {
     }
   }
 
+  async function handleDecrypt() {
+    if (!inputAccessKey) {
+      showToast({
+        title: "Missing access key",
+        message: "Please enter your access key below.",
+        type: "warning",
+      });
+      return;
+    }
+    try {
+      const password = await decryptPassword(inputAccessKey);
+      setDecrypted(true);
+      setInputAccessKey(password);
+    } catch (error) {
+      if (error instanceof DecryptError && error.type === "TIME_LOCK_ACTIVE") {
+        showToast({
+          title: "Still locked",
+          message: "This password hasn't unlocked yet. Check back later.",
+          type: "warning",
+        });
+      } else {
+        showToast({
+          title: "Decryption failed",
+          message: "Something went wrong. Please try again.",
+          type: "failure",
+        });
+      }
+    }
+  }
   useEffect(() => {
     // console.log(customDuration);
   }, [customDuration]);
@@ -126,7 +156,12 @@ const Page = () => {
             />
           )}
           {activeTab === "decrypt" && (
-            <InputKey accessKey={inputAccessKey} onchange={setInputAccessKey} />
+            <InputKey
+              accessKey={inputAccessKey}
+              onchange={setInputAccessKey}
+              onDecrypt={handleDecrypt}
+              decrypted={decrypted}
+            />
           )}
         </div>
         {activeTab === "encrypt" ? (

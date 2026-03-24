@@ -1,4 +1,5 @@
 "use client";
+import { DecryptError } from "@/types/types";
 
 interface EncryptResponse {
   success: boolean;
@@ -41,12 +42,7 @@ export async function decryptPassword(encryptedData: string) {
   const data = await response.json();
 
   if (!data.success) {
-    if (data.errorType === "TIME_LOCK_ACTIVE") {
-      alert("⏰ Time lock has not expired yet. Please wait.");
-      return;
-    }
-    alert(data.error || "Decryption failed");
-    return;
+    throw new DecryptError(data.errorType, data.error);
   }
 
   return data.password;
