@@ -179,6 +179,7 @@ const Page = () => {
               onchange={setInputAccessKey}
               onDecrypt={handleDecrypt}
               decrypted={decrypted}
+              loading={loading}
             />
           )}
         </div>
