@@ -19,6 +19,7 @@ import { useToast } from "@/context/ToastContext";
 import Monitor from "@/components/svgs/Monitor";
 import InputKey from "@/components/InputKey";
 import PwGeneratorLoader from "@/components/PwGeneratorLoader";
+import AccessKeyLoader from "@/components/AccessKeyLoader/AccessKeyLoader";
 
 const PassswordGenerator = dynamic(
   () => import("@/components/PasswordGenerator"),
@@ -58,6 +59,7 @@ const Page = () => {
   const [lockedUntil, setlockedUntil] = useState<string | null>(null);
   const [inputAccessKey, setInputAccessKey] = useState<string>("");
   const [decrypted, setDecrypted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
   async function handleEncrypt() {
@@ -65,19 +67,28 @@ const Page = () => {
     let durationInSec = 0;
 
     if (duration === "custom" && !customDuration.endDate) {
-      alert("Please select an end date from the calendar.");
+      showToast({
+        title: "Date Required",
+        message: "Please select an end date from the calendar.",
+        type: "warning",
+      });
       return;
     }
 
     if (duration === "custom" && customDuration.endDate) {
       durationInSec = getCustomDurationInSeconds(customDuration);
       if (durationInSec === -1) {
-        alert("Selected time is already in the past.");
+        showToast({
+          title: "Invalid Date",
+          message: "Selected time is already in the past.",
+          type: "warning",
+        });
         return;
       }
     } else {
       durationInSec = getDurationInSeconds(duration);
     }
+    setLoading(true);
     try {
       const currentRound = await getCurrentRound();
       const futureRound = calculateFutureRound(durationInSec, currentRound);
@@ -100,6 +111,8 @@ const Page = () => {
         message: "Something went wrong. Please try again.",
         type: "failure",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -112,6 +125,7 @@ const Page = () => {
       });
       return;
     }
+    setLoading(true);
     try {
       const password = await decryptPassword(inputAccessKey);
       setDecrypted(true);
@@ -130,6 +144,8 @@ const Page = () => {
           type: "failure",
         });
       }
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -144,12 +160,13 @@ const Page = () => {
           </h1>
           <PassswordGenerator password={password} setPassword={setPassword} />
           <Tab activeTab={activeTab} setActiveTab={setActiveTab} />
-          {!isEncrypted && activeTab === "encrypt" && (
+          {!isEncrypted && activeTab === "encrypt" && !loading && (
             <LongButton
               text="Encrypt password"
               onClick={() => handleEncrypt()}
             />
           )}
+          {loading && activeTab === "encrypt" && <AccessKeyLoader />}
           {isEncrypted && activeTab === "encrypt" && (
             <Accesskey
               encryptionData={encryptedKey}

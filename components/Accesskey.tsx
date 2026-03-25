@@ -1,7 +1,7 @@
 "use client";
 import LongButton from "./LongButton";
 import { EncryptedData } from "@/app/page";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AccessKeyProps {
   encryptionData: EncryptedData;
@@ -10,14 +10,20 @@ interface AccessKeyProps {
 
 const Accesskey = ({ encryptionData, lockedUntil }: AccessKeyProps) => {
   const [copied, setCopied] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
   async function handleCopy() {
     if (!encryptionData.accessKey) return;
     await navigator.clipboard.writeText(encryptionData.accessKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 5000);
   }
+  useEffect(() => {
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, []);
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="access-key-heading"
       className="bg-card rounded-lg p-3.75 mt-11.25 space-y-5 max-w-175"
     >
@@ -38,10 +44,12 @@ const Accesskey = ({ encryptionData, lockedUntil }: AccessKeyProps) => {
           Save this key now — it can&apos;t be recovered once you leave.
         </p>
         <p className="max-md:text-sm mt-2">
-          Your password unlocks at round - {' '}
-          <span className="font-bold">{encryptionData.unlockRound}</span> 
+          Your password unlocks at round -{" "}
+          <span className="font-bold">{encryptionData.unlockRound}</span>
           <span>: </span>
-          <span className="font-semibold">{lockedUntil ? lockedUntil : ""}</span>
+          <span className="font-semibold">
+            {lockedUntil ? lockedUntil : ""}
+          </span>
         </p>
       </div>
 
