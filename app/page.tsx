@@ -18,10 +18,11 @@ import NorthEast from "@/components/svgs/NorthEast";
 import { useToast } from "@/context/ToastContext";
 import Monitor from "@/components/svgs/Monitor";
 import InputKey from "@/components/InputKey";
+import PwGeneratorLoader from "@/components/PwGeneratorLoader";
 
 const PassswordGenerator = dynamic(
   () => import("@/components/PasswordGenerator"),
-  { ssr: false },
+  { ssr: false, loading: () => <PwGeneratorLoader /> },
 );
 
 export interface EncryptedData {

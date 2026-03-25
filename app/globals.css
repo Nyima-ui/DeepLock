@@ -52,11 +52,11 @@ body {
 }
 
 .slider {
-  @apply w-[244px] h-[10px] appearance-none bg-primary-950 rounded-full outline-none;
+  @apply w-61 h-2.5 appearance-none bg-primary-950 rounded-full outline-none;
 }
 
 .slider::-webkit-slider-thumb {
-  @apply appearance-none w-[29px] h-[29px] bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
+  @apply appearance-none w-7.25 h-7.25 bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
   background-image: url("/unfold_more.svg");
   background-position: center center;
   background-repeat: no-repeat;
@@ -67,9 +67,8 @@ body {
 }
 
 .slider::-moz-range-thumb {
-  @apply w-[27px] h-[27px] bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
+  @apply w-6.75 h-6.75 bg-primary-950 rounded-full cursor-grab border border-primary-500 scale-105;
 }
-
 
 .time {
   appearance: none;
@@ -80,8 +79,6 @@ body {
   display: none !important;
   appearance: none;
 }
-
-
 
 .scrollbar::-webkit-scrollbar {
   width: 10px;
