@@ -42,6 +42,11 @@ const InputKey = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!accessKey || loading || decrypted) return;
+    resizeTextArea();
+  }, [accessKey, loading, decrypted, resizeTextArea]);
+
   async function handleCopy() {
     if (!accessKey) return;
     await navigator.clipboard.writeText(accessKey);

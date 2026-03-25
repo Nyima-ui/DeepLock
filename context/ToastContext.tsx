@@ -3,6 +3,8 @@ import Close from "@/components/svgs/Close";
 import Success from "@/components/svgs/Success";
 import { createContext, useContext, useState } from "react";
 import { cn } from "@/lib/Utils";
+import Failure from "@/components/svgs/Failure";
+import Warning from "@/components/svgs/Warning";
 
 const TOAST_DURATION = 8000;
 
@@ -82,7 +84,9 @@ function ToastNotification({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3.75">
           <span aria-hidden="true">
-            <Success />
+            {config?.type === "success" && <Success />}
+            {config?.type === "failure" && <Failure />}
+            {config?.type === "warning" && <Warning />}
           </span>
           <span className="text-[18px] font-semibold">{config?.title}</span>
         </div>
